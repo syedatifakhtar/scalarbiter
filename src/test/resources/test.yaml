@@ -1,0 +1,79 @@
+---
+name: "populate-impala-/${olgaUser}/dealercode=${dealercode}"
+xmlns: "uri:oozie:workflow:0.4"
+actions:
+    - name: set-last-cat-import-partition-month
+      type: secured-shell
+      script: "../shell-scripts/get-query-result.sh"
+      env-var: [
+        "query=select max(currentmonth) from ${olgaUser}.cat_builder_family",
+        "key=lastCatImportPartitionMonth"
+      ]
+      forceError: kill
+
+    - name: duplicate-serial-number-report-generation
+      type: sub-workflow
+      app-path: ${subworkflowPath}/populate-impala/populate-duplicate-serial-numbers/populate-duplicate-serial-numbers.xml
+      dependencies: [set-last-cat-import-partition-month]
+
+    - name: populate-sales-events
+      type: sub-workflow
+      app-path: ${subworkflowPath}/populate-impala/populate-sales-events/populate-sales-events.xml
+      properties: {
+        catConfigMonth: "${wf:actionData('set-last-cat-import-partition-month')['lastCatImportPartitionMonth']}"
+      }
+      dependencies: [set-last-cat-import-partition-month]
+      forceError: kill
+
+    - name: populate-opportunities
+      type: sub-workflow
+      app-path: ${subworkflowPath}/populate-impala/populate-opportunities/populate-opportunities.xml
+      dependencies: [set-last-cat-import-partition-month]
+      forceError: kill
+
+    - name: populate-others
+      type: sub-workflow
+      app-path: ${subworkflowPath}/populate-impala/populate-others/populate-others.xml
+      dependencies: [set-last-cat-import-partition-month]
+      forceError: kill
+
+    - name: impala-refresh-status-start
+      type: java
+      main-class: com.cat.olga.utils.ImpalaRefreshStatus
+      arg: ["-status", "RUNNING"]
+      dependencies: [
+        populate-sales-events,
+        populate-opportunities,
+        populate-others,
+        duplicate-serial-number-report-generation
+      ]
+      forceError: kill
+
+    - name: move-latest-dealer-impala-data
+      type: fs
+      elem: {
+        delete: {path: "${nameNode}${tableBasePath}/impala/${dealercode}"},
+        move: {
+          source: "${nameNode}${tableBasePath}/impala/${dealercode}-${timestamp}",
+          target: "${nameNode}${tableBasePath}/impala/${dealercode}"
+        }
+      }
+      dependencies: [impala-refresh-status-start]
+      forceError: kill
+
+    - name: refresh-impala-tables
+      type: secured-shell
+      script: "${subworkflowPath}/shell-scripts/refresh-impala.sh"
+      env-var: [
+        "IMPALA_NODE=${impalaDaemonNode}",
+        "SSL_ENABLED=${sslEnabled}"
+      ]
+      dependencies: [move-latest-dealer-impala-data]
+      forceError: kill
+
+    - name: impala-refresh-status-finish
+      type: java
+      main-class: com.cat.olga.utils.ImpalaRefreshStatus
+      arg: ["-status", "SUCCEEDED"]
+      dependencies: [refresh-impala-tables]
+      forceError: kill
