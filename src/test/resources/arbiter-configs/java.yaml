@@ -1,0 +1,16 @@
+---
+actionTypes:
+  - tag: java
+    name: java
+    defaultArgs: {
+      main-class: ["$$main-class$$"],
+      arg: [
+        "-parentWorkflowId",
+        "${parentWorkflowId}",
+        "-timestamp",
+        "${timestamp}",
+        "-currentMonth",
+        "${currentMonth}"
+      ]
+    }
+    configurationPosition: 1

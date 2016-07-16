@@ -1,0 +1,17 @@
+---
+actionTypes:
+  - tag: distcp
+    name: distcp
+    xmlns: uri:oozie:distcp-action:0.2
+    prepare: {
+      delete: "$$destination$$",
+      mkdir: "$$source$$"
+    }
+    defaultArgs: {
+      arg: [
+        "-Dmapred.job.queue.name=${queueName}",
+        "-pgp",
+        "$$source$$",
+        "$$destination$$",
+      ],
+    }

@@ -1,0 +1,27 @@
+---
+actionTypes:
+  - tag: shell
+    name: secured-shell
+    retryMax: 3
+    retryInterval: 1
+    xmlns: uri:oozie:shell-action:0.3
+    defaultArgs: {
+      exec: ["../shell-scripts/shell-executor.sh"],
+      env-var: [
+        "DATABASE=${olgaUser}",
+        "QUEUE_NAME=${queueName}",
+        "HS2_SERVER_URL=${hiveServer2Url}",
+        "HS2_PRINCIPAL=${hive2Principal}",
+        "KERBEROS_ENABLED=${kerberosEnabled}",
+        "KEYTAB_FILE=olgadatt.keytab",
+        "KEYTAB_USER=${keytabUser}",
+        "SCRIPT=script-to-run.sh"
+      ],
+      file: [
+        "../shell-scripts/shell-executor.sh#shell-executor.sh",
+        "$$script$$#script-to-run.sh",
+        "${keytabOnClusterHDFS}#olgadatt.keytab"
+      ],
+      capture-output: [""]
+    }
+    configurationPosition: 1

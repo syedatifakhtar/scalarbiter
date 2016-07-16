@@ -1,0 +1,81 @@
+---
+actionTypes:
+  - tag: java
+    name: crunch-spark
+    cred: "${kerberos.workflow.credentials}"
+    defaultArgs: {
+      main-class: ["org.apache.spark.deploy.SparkSubmit"],
+      java-opts: ["-Dqueue=${queueName} -DnoOfReducers=${veryVeryHighReducers} -Ddealercode=${dealercode} -Djavax.security.auth.useSubjectCredsOnly=false"],
+      arg: [
+        "--class",
+        "$$main-class$$",
+        "--conf",
+        "spark.eventLog.enabled=true",
+        "--conf",
+        "spark.eventLog.dir=${nameNode}/user/spark/applicationHistory",
+        "--jars",
+        "${libPath}/avro-mapred-${avroVersion}-hadoop2.jar,${libPath}/avro-${avroVersion}.jar,${oozieShareLibTimestampPath}/hive/hive-common-0.13.1-cdh5.3.3.jar,${oozieShareLibTimestampPath}/hive/hive2/hive-service-0.13.1-cdh5.3.3.jar,${oozieShareLibTimestampPath}/hive/hive2/hive-jdbc-0.13.1-cdh5.3.3.jar,${oozieShareLibTimestampPath}/hive/hive2/hive-metastore-0.13.1-cdh5.3.3.jar,${oozieShareLibTimestampPath}/hive/hive2/libthrift-0.9.0-cdh5-2.jar,${oozieShareLibTimestampPath}/hive/commons-lang3-3.1.jar,${libPath}/crunch-spark-0.11.0-${cdhVersion}.jar,${libPath}/crunch-core-0.11.0-${cdhVersion}.jar,${libPath}/security-${securityVersion}.jar,${libPath}/domain-model-${domainModelVersion}.jar,${libPath}/datanucleus-api-jdo-3.2.6.jar,${libPath}/datanucleus-core-3.2.10.jar,${libPath}/datanucleus-rdbms-3.2.9.jar,${libPath}/joda-time-2.3.jar,${libPath}/guava-11.0.2.jar",
+        "--master",
+        "yarn",
+        "--deploy-mode",
+        "cluster",
+        "--driver-java-options",
+        "-XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256M -Dqueue=${queueName} -DnoOfReducers=${veryVeryHighReducers} -Djavax.security.auth.useSubjectCredsOnly=false",
+        "--num-executors",
+        "9",
+        "--driver-memory",
+        "1G",
+        "--executor-memory",
+        "2G",
+        "--queue",
+        "${queueName}",
+
+        "name",
+        "$$main-class$$",
+        "--kerberosEnabled",
+        "${kerberosEnabled}",
+        "--kerberosUser",
+        "${keytabUser}",
+        "--tableBasePath",
+        "${tableBasePath}",
+        "--rawBasePath",
+        "${rawBasePath}",
+        "user",
+        "${olgaUser}",
+        "hiveMetaStoreUri",
+        "${hiveMetaStoreUri}",
+        "hiveServer2ConnectionUrl",
+        "${hiveServer2Url}",
+        "hive2Principal",
+        "${hive2Principal}",
+        "hiveUser",
+        "${hiveUser}",
+        "hivePassword",
+        "${hivePassword}",
+        "database",
+        "${olgaUser}",
+
+        "dealerCode",
+        "${dealercode}",
+        "currentMonth",
+        "${currentMonth}",
+        "timestamp",
+        "${timestamp}",
+        "isInitialRun",
+        "${isInitialRun}",
+
+        "keytabOnClusterHDFS",
+        "keytabFile.keytab",
+        "kerbConfOnClusterHDFS",
+        "krb5.conf"
+      ],
+      file: [
+        "${sparkShareLibJar}",
+        "${keytabOnClusterHDFS}#keytabFile.keytab",
+        "${kerberosConfPath}#krb5.conf"
+      ]
+    }
+    properties: {
+      mapred.job.queue.name: "${queueName}"
+    }
+    configurationPosition: 0

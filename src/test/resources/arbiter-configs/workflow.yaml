@@ -1,0 +1,21 @@
+---
+killName: kill
+killMessage: "error message[${wf:errorMessage(wf:lastErrorNode())}]"
+global:
+  defaultArgs: {
+    job-tracker: ["${jobTracker}"],
+    name-node: ["${nameNode}"],
+  }
+  properties: {
+    oozie.launcher.mapred.job.queue.name: "${launcherQueueName}",
+    mapred.job.queue.name: "${queueName}",
+    mapred.reduce.tasks: "${mediumReducers}",
+    oozie.launcher.fs.permissions.umask-mode: 007
+  }
+credentials:
+  - name: "hive2-cred"
+    type: "hive2"
+    properties: {
+      hive2.server.principal: "${hive2Principal}",
+      hive2.jdbc.url: "${hiveServer2Url}",
+    }

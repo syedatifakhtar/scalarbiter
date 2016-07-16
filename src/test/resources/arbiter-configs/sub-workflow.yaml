@@ -1,0 +1,9 @@
+---
+actionTypes:
+  - tag: sub-workflow
+    name: sub-workflow
+    defaultArgs: {
+      app-path: ["$$app-path$$"],
+      propagate-configuration: [""]
+    }
+    configurationPosition: 2

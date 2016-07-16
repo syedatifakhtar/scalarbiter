@@ -1,0 +1,6 @@
+---
+actionTypes:
+  - tag: fs
+    name: fs
+    retryMax: 3
+    retryInterval: 1

@@ -1,0 +1,27 @@
+---
+actionTypes:
+  - tag: hive2
+    name: hive2
+    cred: "${kerberos.workflow.credentials}"
+    retryMax: 3
+    retryInterval: 1
+    xmlns: uri:oozie:hive2-action:0.1
+    defaultArgs: {
+      job-xml: ["${subworkflowPath}/hive-config.xml"],
+      jdbc-url: ["${hiveServer2Url}"],
+      script: ["$$script$$"],
+      param: [
+        "user=${olgaUser}",
+        "queue=${queueName}",
+        "dealercode=${dealercode}",
+        "currentmonth=${currentMonth}",
+        "currentMonth=${currentMonth}",
+        "catConfigMonth=${catConfigMonth}",
+        "timestamp=${timestamp}",
+        "tableBasePath=${tableBasePath}"
+      ]
+    }
+    properties: {
+      oozie.hive.defaults: "${subworkflowPath}/hive-config.xml"
+    }
+    configurationPosition: 1

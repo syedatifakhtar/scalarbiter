@@ -4,3 +4,4 @@ scalaVersion := "2.11.6"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
 libraryDependencies += "net.jcazevedo" %% "moultingyaml" % "0.2"
+libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.2"
